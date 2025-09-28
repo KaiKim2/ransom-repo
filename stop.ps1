@@ -4,6 +4,7 @@ Add-Type -AssemblyName System.Drawing
 
 [void][System.Windows.Forms.Application]::EnableVisualStyles()
 
+# Form setup
 $form = New-Object System.Windows.Forms.Form
 $form.WindowState = 'Maximized'
 $form.FormBorderStyle = 'None'
@@ -57,7 +58,6 @@ $btn.Font = New-Object System.Drawing.Font("Segoe UI",18)
 $btn.Width = 200
 $btn.Height = 56
 $btn.Top = 80
-$btn.Left = ([int]((($form.Width - $btn.Width)/2)))
 $panel.Controls.Add($btn)
 
 # Hide cursor
@@ -74,22 +74,15 @@ $form.Add_KeyDown({
     }
 })
 
-$form.Add_MouseDown({
-    param($sender,$e)
-    $e.Handled = $true
-})
-
-$form.Add_MouseWheel({
-    param($sender,$e)
-    $e.Handled = $true
-})
+$form.Add_MouseDown({ $e.Handled = $true })
+$form.Add_MouseWheel({ $e.Handled = $true })
 
 $btn.Add_Click({
     [System.Windows.Forms.Cursor]::Show()
     $form.Close()
 })
 
-# Timer for countdown
+# Countdown timer
 $duration = 20
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 1000
@@ -103,7 +96,13 @@ $timer.Add_Tick({
         $cnt.Text = $duration.ToString()
     }
 })
-$timer.Start()
 
-# Show dialog
+# Start timer and position button after form is shown
+$form.Add_Shown({
+    $form.Activate()
+    $btn.Left = ([int](($form.Width - $btn.Width)/2))
+    $timer.Start()
+})
+
+# Run the form
 [System.Windows.Forms.Application]::Run($form)
