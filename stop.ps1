@@ -1,5 +1,3 @@
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
@@ -15,36 +13,19 @@ public class KeyboardSimulator {
 }
 "@
 
-# Hide cursor
-[System.Windows.Forms.Cursor]::Hide()
+Write-Host "Simulating Shift key held for 9 seconds, then pressing Enter..."
 
-# Create a full-screen form
-$form = New-Object System.Windows.Forms.Form
-$form.FormBorderStyle = 'None'
-$form.WindowState = 'Maximized'
-$form.TopMost = $true
-
-# Load and display the image
-$picBox = New-Object System.Windows.Forms.PictureBox
-$picBox.Dock = 'Fill'
-$picBox.Image = [System.Drawing.Image]::FromFile("pic.jpg")
-$picBox.SizeMode = 'StretchImage'
-$form.Controls.Add($picBox)
-
-# Show the form (covers the screen)
-$form.Show()
-
-# Simulate holding Shift for 8 seconds
+# Hold Shift down
 [KeyboardSimulator]::keybd_event([KeyboardSimulator]::VK_SHIFT, 0, [KeyboardSimulator]::KEYEVENTF_KEYDOWN, 0)
-Start-Sleep -Seconds 8
+
+# Wait for 9 seconds
+Start-Sleep -Seconds 9
+
+# Release Shift
 [KeyboardSimulator]::keybd_event([KeyboardSimulator]::VK_SHIFT, 0, [KeyboardSimulator]::KEYEVENTF_KEYUP, 0)
 
 # Press Enter once
 [KeyboardSimulator]::keybd_event([KeyboardSimulator]::VK_ENTER, 0, [KeyboardSimulator]::KEYEVENTF_KEYDOWN, 0)
 [KeyboardSimulator]::keybd_event([KeyboardSimulator]::VK_ENTER, 0, [KeyboardSimulator]::KEYEVENTF_KEYUP, 0)
 
-# Keep the image visible until the script is terminated manually
-[System.Windows.Forms.Application]::Run($form)
-
-# If script ends, show the cursor again
-[System.Windows.Forms.Cursor]::Show()
+Write-Host "Done."
