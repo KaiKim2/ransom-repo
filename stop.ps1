@@ -1,10 +1,10 @@
-# simulate_block_winforms_loop.ps1
+# simulate_block_winforms_60s.ps1
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 [void][System.Windows.Forms.Application]::EnableVisualStyles()
 
-$duration = 20
+$duration = 60  # <-- 60 seconds now
 
 $form = New-Object System.Windows.Forms.Form
 $form.WindowState = 'Maximized'
