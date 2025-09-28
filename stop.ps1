@@ -1,11 +1,11 @@
-# simulate_block_winforms.ps1
-# Pure PowerShell WinForms fullscreen simulation (safe). 20s countdown. Esc/CANCEL to exit.
-
+# simulate_block_winforms_fixed.ps1
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 try {
     [void][System.Windows.Forms.Application]::EnableVisualStyles()
+
+    $duration = 20
 
     $form = New-Object System.Windows.Forms.Form
     $form.WindowState = 'Maximized'
@@ -16,7 +16,7 @@ try {
     $form.Bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
     $form.KeyPreview = $true
 
-    # Title / message
+    # Message label
     $lbl = New-Object System.Windows.Forms.Label
     $lbl.AutoSize = $false
     $lbl.TextAlign = 'MiddleCenter'
@@ -27,7 +27,7 @@ try {
     $lbl.Text = "INPUT SIMULATION — Disabled for:"
     $form.Controls.Add($lbl)
 
-    # Counter
+    # Countdown label
     $cnt = New-Object System.Windows.Forms.Label
     $cnt.AutoSize = $false
     $cnt.TextAlign = 'MiddleCenter'
@@ -35,10 +35,10 @@ try {
     $cnt.Height = 260
     $cnt.Font = New-Object System.Drawing.Font("Segoe UI",96,[System.Drawing.FontStyle]::Bold)
     $cnt.ForeColor = [System.Drawing.Color]::Red
-    $cnt.Text = "20"
+    $cnt.Text = $duration.ToString()
     $form.Controls.Add($cnt)
 
-    # Hint + button
+    # Hint + button panel
     $panel = New-Object System.Windows.Forms.Panel
     $panel.Dock = 'Fill'
     $panel.BackColor = [System.Drawing.Color]::Black
@@ -60,14 +60,13 @@ try {
     $btn.Width = 200
     $btn.Height = 56
     $btn.Top = 80
-    # center the button
-    $btn.Left = [int](($form.Bounds.Width - $btn.Width) / 2)
+    $btn.Left = [int](($form.Bounds.Width - $btn.Width)/2)
     $panel.Controls.Add($btn)
 
     # Hide cursor
     [System.Windows.Forms.Cursor]::Hide()
 
-    # Event handlers: swallow input but allow ESC
+    # Event handlers
     $form.Add_KeyDown({
         param($s,$e)
         if ($e.KeyCode -eq 'Escape') {
@@ -93,8 +92,7 @@ try {
         $form.Close()
     })
 
-    # Countdown timer
-    $duration = 20
+    # Timer to count down every second
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 1000
     $timer.Add_Tick({
@@ -109,10 +107,10 @@ try {
     })
     $timer.Start()
 
-    # Run the form (modal)
-    [System.Windows.Forms.Application]::Run($form)
+    # Use ShowDialog to avoid "second message loop" issue
+    $form.ShowDialog() | Out-Null
+
 } catch {
-    # if anything goes wrong, show the error (useful when run interactively)
     [System.Windows.Forms.Cursor]::Show()
     Write-Error "Simulation failed: $($_.Exception.Message)"
     throw
