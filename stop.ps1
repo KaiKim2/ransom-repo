@@ -1,13 +1,10 @@
-$blockInput = Add-Type -MemberDefinition @"
-using System;
-using System.Runtime.InteropServices;
-
+Add-Type @"
 public class BlockInput {
-    [DllImport("user32.dll")]
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
     public static extern bool BlockInput(bool fBlockIt);
 }
-"@ -Name "BlockInput" -Namespace "Win32" -PassThru
+"@
 
-$BlockInput::BlockInput($true)
+[BlockInput]::BlockInput($true)
 Start-Sleep -Seconds 20
-$BlockInput::BlockInput($false)
+[BlockInput]::BlockInput($false)
